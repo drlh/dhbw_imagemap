@@ -1,5 +1,6 @@
 package de.gui;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -28,6 +29,7 @@ public class ImagemapPanel extends JPanel implements MouseListener, MouseMotionL
 	private Image img;
 	private ShapeList shapeList;
 	private Shape currentShape;
+	private BasicStroke stroke; 
 
 	/**
 	 * Create the panel.
@@ -41,6 +43,8 @@ public class ImagemapPanel extends JPanel implements MouseListener, MouseMotionL
 		this.imgmap = im;
 		this.img = img;
 		this.shapeList = shapeList;
+		this.stroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT,
+				BasicStroke.JOIN_MITER, 1.0f, new float[] { 1.0f, 1.0f }, 0.0f);
 		this.setSize(img.getWidth(null), img.getHeight(null));
 		this.setBorder(BorderFactory.createLineBorder(Color.black));
 		this.addMouseMotionListener(this);
@@ -67,6 +71,7 @@ public class ImagemapPanel extends JPanel implements MouseListener, MouseMotionL
 			g2.drawImage(img, 0, 0, null);
 		}
 		if (shapeList.size() > 0) {
+			g2.setStroke(stroke);
 			for (int i = 0; i < shapeList.size(); i++) {
 				shapeList.getShape(i).draw(g2);
 			}
@@ -100,10 +105,7 @@ public class ImagemapPanel extends JPanel implements MouseListener, MouseMotionL
 		Point p = e.getPoint();
 		if (imgmap.tool == imgmap.RECTANGLE) 
 		{
-			currentShape = new Rectangle(p.x, p.y);
-		} else if (imgmap.tool == imgmap.CIRCLE) 
-		{
-			currentShape = new Circle(p.x, p.y);
+		
 		}
 	}
 
@@ -114,13 +116,10 @@ public class ImagemapPanel extends JPanel implements MouseListener, MouseMotionL
 		Point p = e.getPoint();
 		if (imgmap.tool == imgmap.RECTANGLE || imgmap.tool == imgmap.CIRCLE) 
 		{
-			currentShape.setEnd(p.x, p.y);
-			this.shapeList.addShape(currentShape);
+			
 		} 
-		currentShape = null;
-		for (int i = 0; i < shapeList.size(); i++) {
-			System.out.println(shapeList.getShape(i).getShape().toString());
-		}
+		
+
 
 	}
 
@@ -134,9 +133,8 @@ public class ImagemapPanel extends JPanel implements MouseListener, MouseMotionL
 	@Override
 	public void mouseMoved(MouseEvent e)
 	{
-//		System.out.println("moved");
-//		Point p = e.getPoint();
-//		imgmap.setStatusbarText("X: " + p.getX() + ", Y: " + p.getY());
+		Point p = e.getPoint();
+		imgmap.setStatusbarText("X: " + p.getX() + ", Y: " + p.getY());
 	}
 
 }

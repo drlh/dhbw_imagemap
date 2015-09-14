@@ -24,7 +24,7 @@ public class ZeichenWin extends JFrame implements ActionListener {
 	private JToggleButton	polyButton = new JToggleButton(new ImageIcon("poly.gif"));	
 	
 	private ZeichenPanel zeichenPanel = new ZeichenPanel(this);
-	private JMenuBar	menuBar  = new JMenuBar();
+	private JMenuBar	menuBar = new JMenuBar();
 	private JMenu		fileMenu = new JMenu("Datei");
 	private JMenuItem	openItem = new JMenuItem("Öffnen");
 	private JMenuItem	saveItem = new JMenuItem("Sichern");

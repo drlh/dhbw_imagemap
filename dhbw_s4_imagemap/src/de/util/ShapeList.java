@@ -84,7 +84,7 @@ public class ShapeList
 		
 		for (int i = 0; i < size(); i++) {
 			Shape s = list.get(i);
-			str += s.getHTML();
+//			str += s.getHTML();
 		}
 		str += "</map>";
 		return str;

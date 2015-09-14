@@ -1,14 +1,38 @@
 package de.util.shape;
 
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.io.Serializable;
 
-public abstract class Shape 
+public abstract class Shape implements Serializable
 {
-	private Point start;
-	private static int ID = 0;
-	
-	public Shape()
+
+	protected Point start;
+	private String link;
+
+	protected Shape(int x, int y)
 	{
-		ID++;
+		start = new Point(x, y);
 	}
+
+	public abstract void draw(Graphics2D g);
+
+	public abstract boolean contains(Point p);
+
+	public abstract Object getShape();
+	
+	public abstract String getHTML();
+	
+	public abstract void setEnd(int x, int y);
+
+	public String getLink()
+	{
+		return link;
+	}
+
+	public void setLink(String link)
+	{
+		this.link = link;
+	}
+
 }

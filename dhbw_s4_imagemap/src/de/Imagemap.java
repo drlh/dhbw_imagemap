@@ -190,7 +190,7 @@ public class Imagemap extends JFrame implements ActionListener{
       }
     });
     jButton_about.setToolTipText("About ImageMap");
-    jButton_about.setIcon(new ImageIcon(Imagemap.class.getResource("images/about.gif")));
+//    jButton_about.setIcon(new ImageIcon(Imagemap.class.getResource("images/about.gif")));
     jButton_about.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(ActionEvent e) {
         jButton_about_actionPerformed(e);
@@ -203,36 +203,36 @@ public class Imagemap extends JFrame implements ActionListener{
     });
     jScrollPane_image.setDoubleBuffered(true);
     jButton_new.setToolTipText("Clear Imagemap and Image");
-    jButton_new.setIcon(new ImageIcon(Imagemap.class.getResource("images/new.gif")));
+//    jButton_new.setIcon(new ImageIcon(Imagemap.class.getResource("images/new.gif")));
     jButton_new.setMnemonic('N');
     jButton_openimage.setToolTipText("Load Image File");
-    jButton_openimage.setIcon(new ImageIcon(Imagemap.class.getResource("images/image.gif")));
+//    jButton_openimage.setIcon(new ImageIcon(Imagemap.class.getResource("images/image.gif")));
     jButton_openimage.setMnemonic('O');
     jButton_parsehtml.setToolTipText("Parse HTML File for Imagemap");
-    jButton_parsehtml.setIcon(new ImageIcon(Imagemap.class.getResource("images/html.gif")));
+//    jButton_parsehtml.setIcon(new ImageIcon(Imagemap.class.getResource("images/html.gif")));
     jButton_parsehtml.setMnemonic('H');
     jButton_rectangle.setToolTipText("Draw Rectangular Shape");
-    jButton_rectangle.setIcon(new ImageIcon(Imagemap.class.getResource("images/rect.gif")));
+//    jButton_rectangle.setIcon(new ImageIcon(Imagemap.class.getResource("images/rect.gif")));
     jButton_rectangle.setMnemonic('R');
     jButton_circle.setToolTipText("Draw Circle Shape");
-    jButton_circle.setIcon(new ImageIcon(Imagemap.class.getResource("images/circle.gif")));
+//    jButton_circle.setIcon(new ImageIcon(Imagemap.class.getResource("images/circle.gif")));
     jButton_circle.setMnemonic('C');
     jButton_polygon.setToolTipText("Draw Polygon Shape");
-    jButton_polygon.setIcon(new ImageIcon(Imagemap.class.getResource("images/poly.gif")));
+//    jButton_polygon.setIcon(new ImageIcon(Imagemap.class.getResource("images/poly.gif")));
     jButton_polygon.setMnemonic('P');
     statusBar.setText(" ");
     jMenu1.setText("Options");
     jCheckBoxMenuItem_snap.setText("snap to existing points");
     jCheckBoxMenuItem_antialias.setText("anti alias lines");
     jButton_savehtml.setToolTipText("Save HTML Code to File");
-    jButton_savehtml.setIcon(new ImageIcon(Imagemap.class.getResource("images/save.gif")));
+//    jButton_savehtml.setIcon(new ImageIcon(Imagemap.class.getResource("images/save.gif")));
     jButton_savehtml.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(ActionEvent e) {
         jButton_savehtml_actionPerformed(e);
       }
     });
     jButton_copyhtml.setToolTipText("Copy HTML Code to Clipboard");
-    jButton_copyhtml.setIcon(new ImageIcon(Imagemap.class.getResource("images/copy.gif")));
+//    jButton_copyhtml.setIcon(new ImageIcon(Imagemap.class.getResource("images/copy.gif")));
     jButton_copyhtml.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(ActionEvent e) {
         jButton_copyhtml_actionPerformed(e);
@@ -240,7 +240,7 @@ public class Imagemap extends JFrame implements ActionListener{
     });
     jPanel_html.setLayout(borderLayout3);
     jButton_addpoint.setToolTipText("Add Point to Polygon");
-    jButton_addpoint.setIcon(new ImageIcon(Imagemap.class.getResource("images/addpoint.gif")));
+//    jButton_addpoint.setIcon(new ImageIcon(Imagemap.class.getResource("images/addpoint.gif")));
     jButton_addpoint.setMnemonic('A');
     jButton_addpoint.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(ActionEvent e) {
@@ -248,7 +248,7 @@ public class Imagemap extends JFrame implements ActionListener{
       }
     });
     jButton_delpoint.setToolTipText("Remove Point from Polygon");
-    jButton_delpoint.setIcon(new ImageIcon(Imagemap.class.getResource("images/delpoint.gif")));
+//    jButton_delpoint.setIcon(new ImageIcon(Imagemap.class.getResource("images/delpoint.gif")));
     jButton_delpoint.setMnemonic('D');
     jButton_delpoint.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(ActionEvent e) {

@@ -6,9 +6,9 @@ import java.awt.Point;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 
-public class Rectangle extends Shape {
+public class Rect extends Shape {
 
-	public Rectangle(int x, int y, int width, int height) {
+	public Rect(int x, int y, int width, int height) {
 		super(x, y, width, height);
 
 	}

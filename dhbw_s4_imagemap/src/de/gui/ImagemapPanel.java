@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -18,18 +19,22 @@ import javax.swing.event.MouseInputListener;
 
 import de.util.ShapeList;
 import de.util.shape.Circle;
-import de.util.shape.Rectangle;
+import de.util.shape.Rect;
 import de.util.shape.Shape;
 
 @SuppressWarnings("serial")
-public class ImagemapPanel extends JPanel implements MouseListener, MouseMotionListener
+public class ImagemapPanel extends JPanel implements MouseListener,
+		MouseMotionListener
 {
 
 	private ImgMap imgmap;
 	private Image img;
 	private ShapeList shapeList;
 	private Shape currentShape;
-	private BasicStroke stroke; 
+	private BasicStroke stroke;
+
+	private Point startP = null;
+	private Point aktuellerP = null;
 
 	/**
 	 * Create the panel.
@@ -71,19 +76,53 @@ public class ImagemapPanel extends JPanel implements MouseListener, MouseMotionL
 			g2.drawImage(img, 0, 0, null);
 		}
 		if (shapeList.size() > 0) {
-			g2.setStroke(stroke);
 			for (int i = 0; i < shapeList.size(); i++) {
 				shapeList.getShape(i).draw(g2);
 			}
 		}
-		
-		repaint();
+
+		if ((imgmap.tool == ImgMap.RECTANGLE || imgmap.tool == ImgMap.CIRCLE )
+				&& startP != null && aktuellerP != null) {
+			Rectangle r = berechneRect();
+			g2.setStroke(stroke);
+			g2.setColor(Color.BLACK);
+			g2.drawRect(r.x, r.y, r.width, r.height);
+		}
+	}
+
+	private Rectangle berechneRect()
+	{
+		Rectangle r = new Rectangle();
+
+		if (aktuellerP != null && startP != null) {
+			int width = aktuellerP.x - startP.x;
+			int height = aktuellerP.y - startP.y;
+
+			r = new Rectangle(startP.x, startP.y, width, height);
+			r = ausgleichRect(r);
+		}
+		return r;
+	}
+
+	private Rectangle ausgleichRect(Rectangle re)
+	{
+		if (re != null) {
+			if (re.width < 0) {
+				re.width = -re.width;
+				re.x -= re.width;
+			}
+			if (re.height < 0) {
+				re.height = -re.height;
+				re.y -= re.height;
+			}
+		}
+		return re;
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e)
 	{
-		System.out.println("clicked");
+
 	}
 
 	@Override
@@ -95,39 +134,42 @@ public class ImagemapPanel extends JPanel implements MouseListener, MouseMotionL
 	@Override
 	public void mouseExited(MouseEvent e)
 	{
-		
+
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e)
 	{
-		System.out.println("pressed");
-		Point p = e.getPoint();
-		if (imgmap.tool == imgmap.RECTANGLE) 
-		{
-		
-		}
+		startP = e.getPoint();
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e)
 	{
-		System.out.println("released");
-		Point p = e.getPoint();
-		if (imgmap.tool == imgmap.RECTANGLE || imgmap.tool == imgmap.CIRCLE) 
-		{
-			
-		} 
+		Rectangle re = berechneRect();
+		Shape s = null;
+
+		switch (imgmap.tool) {
+		case ImgMap.RECTANGLE:
+			s = new Rect(re.x, re.y, re.width, re.height);
+			break;
+		case ImgMap.CIRCLE:
+			s = new Circle(re.x, re.y, re.width, re.height);
+			break;
+		}
 		
-
-
+		if (s != null) {
+			shapeList.addShape(s);
+			repaint();
+		}
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e)
 	{
-		// TODO Auto-generated method stub
-
+		aktuellerP = e.getPoint();
+		
+		repaint();
 	}
 
 	@Override

@@ -46,9 +46,9 @@ public class ImgMap extends JFrame implements ActionListener
 {
 
 	// CONSTANTS - Tools
-	public final int ARROW = 0;
-	public final int RECTANGLE = 1;
-	public final int CIRCLE = 2;
+	public final static int ARROW = 0;
+	public final static int RECTANGLE = 1;
+	public final static int CIRCLE = 2;
 	public int tool = 0;
 
 	// CONTENTPANE

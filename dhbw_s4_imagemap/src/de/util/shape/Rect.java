@@ -10,19 +10,19 @@ public class Rect extends Shape {
 
 	public Rect(int x, int y, int width, int height) {
 		super(x, y, width, height);
-
+		type = RECT;
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
 		g.setColor(color);
-		g.fillRect(r.x, r.y, r.width, r.height);
+		g.fillRect(rect.x, rect.y, rect.width, rect.height);
 	}
 
 
 	@Override
 	public boolean contains(Point p) {
-		Rectangle2D e = new Rectangle2D.Double(r.x, r.y, r.width, r.height);
+		Rectangle2D e = new Rectangle2D.Double(rect.x, rect.y, rect.width, rect.height);
 		return e.contains(p);
 	}
 

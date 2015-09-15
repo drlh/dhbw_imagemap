@@ -74,17 +74,17 @@ public class ShapeList
 			list.remove(selectedShape);
 	}
 
-	public String getHTML(String imgSrc, int w, int h)
+	public String getHTML(String imgSrc, int panelW, int panelH)
 	{
 		String mapName = "MAP";
 		
-		String str = new String("<img src=\"" + imgSrc + "\" width=\"" + w
-				+ "\" height=\"" + h + "\" usemap=\"#" + mapName
+		String str = new String("<img src=\"" + imgSrc + "\" width=\"" + panelW
+				+ "\" height=\"" + panelH + "\" usemap=\"#" + mapName
 				+ "\" border=\"0\">\n<map name=\"" + mapName + "\">\n");
 		
 		for (int i = 0; i < size(); i++) {
 			Shape s = list.get(i);
-//			str += s.getHTML();
+			str += s.getHTML();
 		}
 		str += "</map>";
 		return str;

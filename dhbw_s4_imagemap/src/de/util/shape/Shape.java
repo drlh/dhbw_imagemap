@@ -7,18 +7,23 @@ import java.awt.Rectangle;
 import java.io.Serializable;
 import java.util.Random;
 
-import zeichnenStart.InfoDialog;
-import zeichnenStart.ZeichenWin;
-
-public abstract class Shape implements Serializable {
+@SuppressWarnings("serial")
+public abstract class Shape implements Serializable
+{
+	protected final int RECT = 1;
+	protected final int CIRCLE = 2;
+	protected int type = 0;
+	
 	protected Color color;
-	protected Rectangle r;
+	protected Rectangle rect;
+	protected String href;
 
-	public Shape(int x, int y, int width, int height) {
+	protected Shape(int x, int y, int width, int height)
+	{
 		color = generateColor();
-		r = new Rectangle(x, y, width, height);
+		rect = new Rectangle(x, y, width, height);
+		href = "";
 	}
-
 
 	private Color generateColor()
 	{
@@ -28,16 +33,42 @@ public abstract class Shape implements Serializable {
 		return new Color(r, g, b);
 	}
 
-
 	public abstract void draw(Graphics2D g);
 
 	public abstract boolean contains(Point p);
 
-	public Rectangle getR() {
-		return r;
+	public Rectangle getShape()
+	{
+		return rect;
 	}
 
-	public void setR(Rectangle r) {
-		this.r = r;
+	public String getHref()
+	{
+		return href;
+	}
+
+	public void setHref(String href)
+	{
+		this.href = href;
+	}
+
+	public void setShape(Rectangle r)
+	{
+		this.rect = r;
+	}
+
+	public String getHTML()
+	{
+		String s = "";
+		if (type == RECT) {
+			s = new String("<area shape=rect coords=\"" + rect.x + "," + rect.y
+					+ "," + (int) (rect.x + rect.width) + ","
+					+ (int) (rect.y + rect.height) + "\" href=\"" + href+ "\">\n");
+		} else if (type == CIRCLE) {
+			s = new String("<area shape=circle coords=\"" + rect.x + ","
+					+ rect.y + "," + (int) (rect.x + rect.width) + ","
+					+ (int) (rect.y + rect.height)+ "\" href=\"" + href+ "\">\n");
+		}
+		return s;
 	}
 }

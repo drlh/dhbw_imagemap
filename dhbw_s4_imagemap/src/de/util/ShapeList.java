@@ -74,6 +74,13 @@ public class ShapeList
 			list.remove(selectedShape);
 	}
 
+	/**
+	 * List die Koordinaten der einzelnen Shapes aus und gibt HTML Code der img Map zurück
+	 * @param imgSrc
+	 * @param panelW
+	 * @param panelH
+	 * @return
+	 */
 	public String getHTML(String imgSrc, int panelW, int panelH)
 	{
 		String mapName = "MAP";
@@ -88,5 +95,13 @@ public class ShapeList
 		}
 		str += "</map>";
 		return str;
+	}
+
+	/**
+	 * Leert die Liste der Shapes
+	 */
+	public void flush()
+	{
+		this.list.removeAllElements();
 	}
 }

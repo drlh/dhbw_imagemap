@@ -11,6 +11,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -56,14 +57,13 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 		this.addMouseMotionListener(this);
 		this.addMouseListener(this);
 		this.setVisible(true);
-		
 
 	}
 
 	public void setImage(Image img)
 	{
 		this.img = img;
-//		this.setSize(img.getWidth(null), img.getHeight(null));
+		// this.setSize(img.getWidth(null), img.getHeight(null));
 		revalidate();
 		repaint();
 	}
@@ -112,7 +112,8 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 	 */
 	private void verschiebeRect(Rectangle r)
 	{
-		if (imgmap.tool == ImgMap.ARROW && aktuelleR != null && aktuellerP != null) {
+		if (imgmap.tool == ImgMap.ARROW && aktuelleR != null
+				&& aktuellerP != null) {
 			int offX = aktuellerP.x - startP.x;
 			int offY = aktuellerP.y - startP.y;
 			r = (Rectangle) aktuelleR.clone();
@@ -121,7 +122,7 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 			repaint();
 		}
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -130,10 +131,18 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 		if (aktuellerShape != null) {
 			String s = JOptionPane.showInputDialog("Link: ", "http://");
 			aktuellerShape.setHref(s);
-			
+
 			this.imgmap.tool = ImgMap.ARROW;
 			this.imgmap.setStatusbarWerkzeug();
+			this.imgmap.setStatusbarMessage("");
 		}
+	}
+
+	public void flush()
+	{
+		shapeList.flush();
+		this.img = new BufferedImage(700, 500, BufferedImage.TYPE_INT_RGB);
+		repaint();
 	}
 
 	@Override
@@ -141,7 +150,7 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 	{
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
-	
+
 		if (img != null) {
 			g2.drawImage(img, 0, 0, null);
 		}
@@ -150,7 +159,7 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 				shapeList.getShape(i).draw(g2);
 			}
 		}
-	
+
 		if ((imgmap.tool == ImgMap.RECTANGLE || imgmap.tool == ImgMap.CIRCLE)
 				&& startP != null && aktuellerP != null) {
 			Rectangle r = berechneRect();
@@ -158,7 +167,7 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 			g2.setColor(Color.BLACK);
 			g2.drawRect(r.x, r.y, r.width, r.height);
 		}
-		
+
 		/* Aufbau des HTML-Codes */
 		imgmap.readFromVectorHtmlText();
 	}
@@ -222,23 +231,24 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 			shapeList.addShape(s);
 			repaint();
 		}
-		
+
 		/* Verschiebt das gezeichnete Obj, falls verschoben */
 		verschiebeRect(aktuelleR);
-		
+
 		startP = null;
 		aktuellerP = null;
 		aktuelleR = null;
 	}
-	
+
 	@Override
 	public void mouseDragged(MouseEvent e)
 	{
 		aktuellerP = e.getPoint();
-		
+
 		verschiebeRect(aktuelleR);
-		
-		imgmap.setStatusbarMouseposition("X: " + aktuellerP.getX() + ", Y: " + aktuellerP.getY());
+
+		imgmap.setStatusbarMouseposition("X: " + aktuellerP.getX() + ", Y: "
+				+ aktuellerP.getY());
 
 		repaint();
 	}

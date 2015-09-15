@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -28,12 +30,13 @@ import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.util.*;
 
-public class ImgMap extends JFrame implements ActionListener
+public class ImgMap extends JFrame implements ActionListener, WindowListener
 {
 
 	// CONSTANTS - Tools
@@ -56,22 +59,19 @@ public class ImgMap extends JFrame implements ActionListener
 	private ShapeList shapeList = new ShapeList();
 
 	// MENU
-	private JMenuBar menuBar = new JMenuBar();
-	private JMenu mnDatei = new JMenu("Datei");
-	private JMenuItem mntmNeu = new JMenuItem("Neu");
-	private JSeparator separator = new JSeparator();
-	private JMenuItem mntmBeenden = new JMenuItem("Beenden");
-	private JMenu mnOptionen = new JMenu("Optionen");
-	private JMenu mnHilfe = new JMenu("Hilfe");
-	private JMenuItem mntmber = new JMenuItem("\u00DCber ...");
-	private final JMenu mnLookAndFeel = new JMenu("Look and Feel");
-	private final ButtonGroup rbtngLNF = new ButtonGroup();
-	private final JRadioButtonMenuItem rdbtnmntmSystem = new JRadioButtonMenuItem(
-			"System");
-	private final JRadioButtonMenuItem rdbtnmntmCrossplattform = new JRadioButtonMenuItem(
-			"Crossplattform");
-	private final JRadioButtonMenuItem rdbtnmntmMotif = new JRadioButtonMenuItem(
-			"Motif");
+	private JMenuBar menuBar;
+	private JMenu mnDatei;
+	private JMenuItem mntmNeu;
+	private JMenuItem mntmBeenden;
+	private JMenuItem mntmNeuBild;
+	private JMenu mnOptionen;
+	private JMenu mnHilfe;
+	private JMenuItem mntmber;
+	private JMenu mnLookAndFeel;
+	private ButtonGroup rbtngLNF;
+	private JRadioButtonMenuItem rdbtnmntmSystem;
+	private JRadioButtonMenuItem rdbtnmntmCrossplattform;
+	private JRadioButtonMenuItem rdbtnmntmMotif;
 
 	// TOOLBAR
 	private JToolBar toolBar = new JToolBar();
@@ -98,6 +98,8 @@ public class ImgMap extends JFrame implements ActionListener
 
 	// MISC
 	Helper helper = new Helper();
+	private JToolBar toolBar_1;
+	private JButton btnSave;
 
 	/**
 	 * Create the frame.
@@ -115,7 +117,7 @@ public class ImgMap extends JFrame implements ActionListener
 		this.setSize(framesize);
 		this.setLocationRelativeTo(null);
 		this.setTitle("ImageMap Editor");
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(endProgramm());
 
 		/* Initial Bild */
 		image = emptyImage;
@@ -132,11 +134,17 @@ public class ImgMap extends JFrame implements ActionListener
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		sP_html.setPreferredSize(new Dimension(this.getWidth(), this
 				.getHeight()));
+		
+		toolBar_1 = new JToolBar();
+		sP_html.setColumnHeaderView(toolBar_1);
+		
+		btnSave = new JButton("Save");
+		toolBar_1.add(btnSave);
 
 		createMenu();
 		createToolbar();
-		content();
 		addListener();
+		content();
 	}
 
 	/**
@@ -144,12 +152,30 @@ public class ImgMap extends JFrame implements ActionListener
 	 */
 	private void createMenu()
 	{
+		menuBar = new JMenuBar();
+		mnOptionen = new JMenu("Optionen");
+		mnHilfe = new JMenu("Hilfe");
+		mnLookAndFeel = new JMenu("Look and Feel");
+
+		mnDatei = new JMenu("Datei");
+		mntmNeu = new JMenuItem("Neu");
+		mntmNeuBild = new JMenuItem("Bild öffnen");
+		mntmBeenden = new JMenuItem("Beenden");
+
+		mntmber = new JMenuItem("\u00DCber ...");
+
+		rbtngLNF = new ButtonGroup();
+		rdbtnmntmSystem = new JRadioButtonMenuItem("System");
+		rdbtnmntmCrossplattform = new JRadioButtonMenuItem("Crossplattform");
+		rdbtnmntmMotif = new JRadioButtonMenuItem("Motif");
+
 		setJMenuBar(menuBar);
 
 		// Datei-Menü
 		menuBar.add(mnDatei);
 		mnDatei.add(mntmNeu);
-		mnDatei.add(separator);
+		mnDatei.add(mntmNeuBild);
+		mnDatei.add(new JSeparator());
 		mnDatei.add(mntmBeenden);
 
 		// Optionsmenü
@@ -172,32 +198,28 @@ public class ImgMap extends JFrame implements ActionListener
 
 	private void createToolbar()
 	{
-		btnNeu = new JButton(new ImageIcon("img/new.png"));
-		btnNeuImg = new JButton("Bild laden");
-		
-		btnArrow = new JButton("Auswahl");
-		btnRectangle = new JButton("Rect");
-		btnCircle = new JButton("Circle");
-		
-		btnHref = new JButton("Link");
-		btnInfo = new JButton("About");
-	}
+		btnNeu = new JButton(new ImageIcon(getClass().getResource("/new.png")));
+		btnNeu.setToolTipText("Neues Projekt");
+		btnNeuImg = new JButton(new ImageIcon(getClass().getResource(
+				"/picture.png")));
+		btnNeuImg.setToolTipText("Bild laden");
 
-	private void addListener()
-	{
-		// MENU / Option / Look & Feel
-		rdbtnmntmCrossplattform.addActionListener(this);
-		rdbtnmntmMotif.addActionListener(this);
-		rdbtnmntmSystem.addActionListener(this);
+		btnArrow = new JButton(new ImageIcon(getClass().getResource(
+				"/arrow.png")));
+		btnArrow.setToolTipText("Auswahl Werkzeug");
+		btnRectangle = new JButton(new ImageIcon(getClass().getResource(
+				"/rect.png")));
+		btnRectangle.setToolTipText("Rechteck zeichnen");
+		btnCircle = new JButton(new ImageIcon(getClass().getResource(
+				"/ellipse.png")));
+		btnCircle.setToolTipText("Ellipse zeichnen");
 
-		// TOOLBAR
-		btnNeu.addActionListener(this);
-		btnNeuImg.addActionListener(this);
-		btnArrow.addActionListener(this);
-		btnCircle.addActionListener(this);
-		btnRectangle.addActionListener(this);
-		btnHref.addActionListener(this);
-		btnInfo.addActionListener(this);
+		btnHref = new JButton(new ImageIcon(getClass().getResource(
+				"/commands.png")));
+		btnHref.setToolTipText("Link zum Bereich hinzufügen");
+		btnInfo = new JButton(
+				new ImageIcon(getClass().getResource("/help.png")));
+		btnInfo.setToolTipText("Über ...");
 	}
 
 	/**
@@ -237,17 +259,43 @@ public class ImgMap extends JFrame implements ActionListener
 
 	}
 
+	private void addListener()
+	{
+		// MENU / Option / Look & Feel
+		rdbtnmntmCrossplattform.addActionListener(this);
+		rdbtnmntmMotif.addActionListener(this);
+		rdbtnmntmSystem.addActionListener(this);
+
+		// TOOLBAR
+		btnNeu.addActionListener(this);
+		btnNeuImg.addActionListener(this);
+		btnArrow.addActionListener(this);
+		btnCircle.addActionListener(this);
+		btnRectangle.addActionListener(this);
+		btnHref.addActionListener(this);
+		btnInfo.addActionListener(this);
+	}
+
+	/**
+	 * 
+	 */
+	private void doNeu()
+	{
+		this.mapPanel.flush();
+	}
+
 	private void doLoadNewImage()
 	{
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("jpg",
-				"jpeg", "png", "gif", "bmp", "tif");
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("Bilder",
+				"jpg", "jpeg", "png", "gif", "bmp", "tif");
 		JFileChooser fc = new JFileChooser();
 		fc.addChoosableFileFilter(filter);
 
 		int result = fc.showOpenDialog(null);
 		if (result == JFileChooser.APPROVE_OPTION) {
 			File file = fc.getSelectedFile();
-			imgSrc = file.getAbsolutePath(); // THIS WAS THE PROBLEM
+			imgSrc = file.getAbsolutePath();
+
 			try {
 				if (filter.accept(file)) {
 					image = ImageIO.read(file);
@@ -267,6 +315,15 @@ public class ImgMap extends JFrame implements ActionListener
 				e1.printStackTrace();
 			}
 		}
+	}
+
+	/**
+	 * Beendet das Programm nach einer Abfrage
+	 */
+	private int endProgramm()
+	{
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	/**
@@ -300,7 +357,7 @@ public class ImgMap extends JFrame implements ActionListener
 	 */
 	public void setStatusbarMessage(String s)
 	{
-		lblMessage.setText("	, Nachricht: " + s);
+		lblMessage.setText(",   \t\t" + s);
 	}
 
 	public void setStatusbarMouseposition(String s)
@@ -322,52 +379,90 @@ public class ImgMap extends JFrame implements ActionListener
 	{
 		Object src = e.getSource();
 
-		/* Neues Bild laden */
-		if (src == this.btnNeuImg) {
+		/* Neues Project und neues Bild */
+		if (src == this.btnNeu)
+			doNeu();
+
+		if (src == this.btnNeuImg)
 			doLoadNewImage();
-			return;
-		}
 
-		/* Werkzeug: Pfeil */
-		if (src == this.btnArrow) {
+		/* Werkzeuge */
+		if (src == this.btnArrow)
 			tool = ARROW;
-			return;
-		}
 
-		/* Werkzeug: Rechteck */
-		if (src == this.btnRectangle) {
+		if (src == this.btnRectangle)
 			tool = RECTANGLE;
-			return;
-		}
 
-		/* Werkzeug: Kreis */
-		if (src == this.btnCircle) {
+		if (src == this.btnCircle)
 			tool = CIRCLE;
-			return;
-		}
 
-		/* Werkzeug: Link */
 		if (src == this.btnHref) {
 			tool = LINK;
-			return;
+			setStatusbarMessage("Bitte wählen sie einen Shape aus!");
 		}
 
 		/* 		 */
 		if (src == this.rdbtnmntmCrossplattform) {
 			helper.changeLookAndFeel(Helper.LF_CROSS, this);
-			return;
 		}
 		if (src == this.rdbtnmntmSystem) {
 			helper.changeLookAndFeel(Helper.LF_SYSTEM, this);
-			return;
 		}
 		if (src == this.rdbtnmntmMotif) {
 			helper.changeLookAndFeel(Helper.LF_MOTIF, this);
-			return;
 		}
 
 		/* aktualisiert das Werkzeug in der Statusbar */
 		setStatusbarWerkzeug();
 
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

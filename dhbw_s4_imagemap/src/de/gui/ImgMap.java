@@ -327,6 +327,9 @@ public class ImgMap extends JFrame implements ActionListener
 		mntmHtmlSpeichern.addActionListener(this);
 		mntmNeu.addActionListener(this);
 		mntmNeuBild.addActionListener(this);
+		
+		mntmber.addActionListener(this);
+		btnInfo.addActionListener(this);
 
 		// MENU / Option / Look & Feel
 		rdbtnmntmCrossplattform.addActionListener(this);
@@ -465,6 +468,9 @@ public class ImgMap extends JFrame implements ActionListener
 			doSaveHTML();
 		if (src == this.mntmBeenden) {
 			this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+		}
+		if (src == this.mntmber || src == this.btnInfo) {
+			JOptionPane.showMessageDialog(this, "Autor: Leo Hellwich");
 		}
 
 		/* Werkzeuge */

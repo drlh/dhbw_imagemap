@@ -3,6 +3,7 @@ package de.gui;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -54,18 +55,21 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 	private Point cloneP = null;
 	private Rectangle aktuelleR = null;
 	private JPopupMenu popupMenu;
-	
+
 	private JMenuItem mntmKopieren;
 	private JMenuItem mntmEinfgen;
 	private JMenuItem mntmAusschneiden;
 	private JMenuItem mntmLschen;
 
 	/**
-	 * Create the panel.
+	 * Konstruktor für das Bildpanel
 	 * 
-	 * @param lblStatusbar
+	 * @param im
+	 *            Übergeordnete ImgMap Klasse
 	 * @param img
+	 *            Bild, welches gezeihnet werden soll
 	 * @param shapeList
+	 *            Liste mit den einzuzeichnenden Bereichen
 	 */
 	public ImagemapPanel(ImgMap im, Image img, ShapeList shapeList)
 	{
@@ -77,40 +81,48 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 		this.setBorder(BorderFactory.createLineBorder(Color.black));
 		this.addMouseMotionListener(this);
 		this.addMouseListener(this);
-		
+
 		popupMenu = new JPopupMenu();
 		mntmKopieren = new JMenuItem("Kopieren");
 		mntmEinfgen = new JMenuItem("Einf\u00FCgen");
 		mntmAusschneiden = new JMenuItem("Ausschneiden");
 		mntmLschen = new JMenuItem("L\u00F6schen");
-		
+
 		addPopup(this, popupMenu);
 		popupMenu.add(mntmKopieren);
 		popupMenu.add(mntmEinfgen);
 		popupMenu.add(mntmAusschneiden);
 		popupMenu.add(mntmLschen);
-		
+
 		mntmKopieren.addActionListener(this);
 		mntmEinfgen.addActionListener(this);
 		mntmAusschneiden.addActionListener(this);
 		mntmLschen.addActionListener(this);
-		
+
 		mntmEinfgen.setEnabled(false);
-		
+
 		this.setVisible(true);
 	}
 
+	/**
+	 * Zeichnet ein Bild in die Zeichenfläche
+	 * 
+	 * @param img
+	 *            zu zeichnendes Bild
+	 */
 	public void setImage(Image img)
 	{
 		this.img = img;
-		// this.setSize(img.getWidth(null), img.getHeight(null));
+		this.setPreferredSize(new Dimension((int) img.getWidth(null), (int) img
+				.getHeight(null)));
 		revalidate();
 		repaint();
 	}
 
 	/**
+	 * Errechnet das Shape, welches aus zei Punkten entsteht
 	 * 
-	 * @return
+	 * @return Rectangle
 	 */
 	private Rectangle berechneRect()
 	{
@@ -127,10 +139,8 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 	}
 
 	/**
-	 * Normalisiert das eingezeichnete Object
-	 * 
-	 * @param re
-	 *            zu normalisierendes Objekt
+	 * Normalisiert das eingezeichnete Objekt.
+	 * @param re zu normalisierendes Objekt
 	 * @return Gibt das normiliserte Object zurück
 	 */
 	private Rectangle ausgleichRect(Rectangle re)
@@ -149,8 +159,8 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 	}
 
 	/**
-	 * 
-	 * @param r
+	 * Methode zum verschieben des SHapes bei gedrückter Maustaste
+	 * @param r zu verschiebende Rectangle eines Shapes
 	 */
 	private void verschiebeRect(Rectangle r)
 	{
@@ -221,7 +231,7 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 	public void mouseClicked(MouseEvent e)
 	{
 		if (e.getButton() == MouseEvent.BUTTON3) {
-			
+
 			for (int i = shapeList.size() - 1; i >= 0; i--) {
 				Shape shape = shapeList.getShape(i);
 				Rectangle re = shape.getShape();
@@ -267,7 +277,7 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 					}
 				}
 			}
-			
+
 		}
 	}
 
@@ -289,10 +299,10 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 			setLink();
 			break;
 		}
-		
+
 		if (e.getButton() == MouseEvent.BUTTON3) {
 			for (int i = shapeList.size() - 1; i >= 0; i--) {
-				
+
 				Shape shape = shapeList.getShape(i);
 				Rectangle re1 = shape.getShape();
 				if (shape.contains(startP)) {
@@ -305,7 +315,7 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 					break;
 				}
 			}
-		}		
+		}
 
 		if (s != null) {
 			shapeList.addShape(s);
@@ -341,19 +351,25 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 		imgmap.setStatusbarMouseposition("X: " + p.getX() + ", Y: " + p.getY());
 	}
 
-	private static void addPopup(Component component, final JPopupMenu popup) {
+	private static void addPopup(Component component, final JPopupMenu popup)
+	{
 		component.addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent e) {
+			public void mousePressed(MouseEvent e)
+			{
 				if (e.isPopupTrigger()) {
 					showMenu(e);
 				}
 			}
-			public void mouseReleased(MouseEvent e) {
+
+			public void mouseReleased(MouseEvent e)
+			{
 				if (e.isPopupTrigger()) {
 					showMenu(e);
 				}
 			}
-			private void showMenu(MouseEvent e) {
+
+			private void showMenu(MouseEvent e)
+			{
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
 		});
@@ -363,7 +379,7 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 	public void actionPerformed(ActionEvent e)
 	{
 		Object src = e.getSource();
-		
+
 		if (src == mntmKopieren) {
 			popupSelection = COPY;
 			cloneShape = aktuellerShape;
@@ -371,14 +387,14 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 		}
 		if (src == mntmEinfgen) {
 			popupSelection = PASTE;
-			
+
 			Rectangle r = cloneShape.getShape();
-			r.setBounds(cloneP.x, cloneP.y, (int) r.getWidth(), (int) r.getHeight()); 
-			
+			r.setBounds(cloneP.x, cloneP.y, (int) r.getWidth(),
+					(int) r.getHeight());
+
 			cloneShape.setShape(r);
 			shapeList.addShape(cloneShape);
-			
-			
+
 			mntmEinfgen.setEnabled(false);
 			cloneShape = null;
 			repaint();
@@ -396,7 +412,6 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 			mntmEinfgen.setEnabled(false);
 			repaint();
 		}
-		
-		
+
 	}
 }

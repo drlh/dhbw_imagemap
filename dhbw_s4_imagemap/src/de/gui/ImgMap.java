@@ -43,6 +43,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.util.*;
 
+/**
+ * Programm zum erstellen einer Image Map 
+ * @author Leo Hellwich
+ */
 public class ImgMap extends JFrame implements ActionListener
 {
 
@@ -244,6 +248,9 @@ public class ImgMap extends JFrame implements ActionListener
 		mnHilfe.add(mntmber);
 	}
 
+	/**
+	 * Erstellt die Toolbar mit den Werkzeugen 
+	 */
 	private void createToolbar()
 	{
 		int menuKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -310,7 +317,7 @@ public class ImgMap extends JFrame implements ActionListener
 	}
 
 	/**
-	 * 
+	 * Fügt den Komponenten auf dem Frame ihre benötigten Listener hinzu
 	 */
 	private void addListener()
 	{
@@ -320,8 +327,6 @@ public class ImgMap extends JFrame implements ActionListener
 		mntmHtmlSpeichern.addActionListener(this);
 		mntmNeu.addActionListener(this);
 		mntmNeuBild.addActionListener(this);
-
-		// MENU / Bearbeiten
 
 		// MENU / Option / Look & Feel
 		rdbtnmntmCrossplattform.addActionListener(this);
@@ -396,7 +401,6 @@ public class ImgMap extends JFrame implements ActionListener
 
 	/**
 	 * Methode zur Erstellung des Statusbartextes des aktuellen Werkzeuges.
-	 * @param mouseposition
 	 */
 	public void setStatusbarWerkzeug()
 	{
@@ -428,7 +432,7 @@ public class ImgMap extends JFrame implements ActionListener
 	}
 
 	/**
-	 * Zeig die aktuelle Mausposition an
+	 * Zeig die aktuelle Mausposition an in der rechten Statusbar an
 	 * @param s aktuelle Mausposition
 	 */
 	public void setStatusbarMouseposition(String s)

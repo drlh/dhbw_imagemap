@@ -28,9 +28,8 @@ public class Helper
 	 * Ändert das Look and Feel des übergebenen Frames und zeichnet dieses neu
 	 * Konstanten: LF_CROSS = 1, LF_SYSTEM = 2, LF_MOTIF = 3
 	 * 
-	 * @param lf
-	 *            Variable für die Konstante
-	 * @param f
+	 * @param lf 	Variable für die Konstante
+	 * @param f 	Übergeordneter JFrame
 	 */
 	public void changeLookAndFeel(int lf, JFrame f)
 	{
@@ -63,6 +62,11 @@ public class Helper
 		f.repaint();
 	}
 
+	/**
+	 * Speichert übergebenen HTML Code in einer Datei
+	 * @param html_map	HTML COde
+	 * @param f			Übergeordneter Frame
+	 */
 	public void saveHtml(String html_map, JFrame f)
 	{
 		String html = "<html>" + "<head><title>Image Map</title></head>"

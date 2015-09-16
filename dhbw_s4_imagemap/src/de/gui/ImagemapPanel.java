@@ -8,6 +8,8 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -17,6 +19,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.event.MouseInputListener;
 
 import de.util.ShapeList;
@@ -24,10 +27,20 @@ import de.util.shape.Circle;
 import de.util.shape.Rect;
 import de.util.shape.Shape;
 
+import java.awt.Component;
+import java.awt.event.MouseAdapter;
+
+import javax.swing.JMenuItem;
+
 @SuppressWarnings("serial")
 public class ImagemapPanel extends JPanel implements MouseListener,
-		MouseMotionListener
+		MouseMotionListener, ActionListener
 {
+	private final int COPY = 1;
+	private final int PASTE = 2;
+	private final int CUT = 3;
+	private final int DEL = 4;
+	private int popupSelection = 0;
 
 	private ImgMap imgmap;
 	private Image img;
@@ -37,7 +50,15 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 	private Point startP = null;
 	private Point aktuellerP = null;
 	private Shape aktuellerShape = null;
+	private Shape cloneShape = null;
+	private Point cloneP = null;
 	private Rectangle aktuelleR = null;
+	private JPopupMenu popupMenu;
+	
+	private JMenuItem mntmKopieren;
+	private JMenuItem mntmEinfgen;
+	private JMenuItem mntmAusschneiden;
+	private JMenuItem mntmLschen;
 
 	/**
 	 * Create the panel.
@@ -56,8 +77,27 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 		this.setBorder(BorderFactory.createLineBorder(Color.black));
 		this.addMouseMotionListener(this);
 		this.addMouseListener(this);
+		
+		popupMenu = new JPopupMenu();
+		mntmKopieren = new JMenuItem("Kopieren");
+		mntmEinfgen = new JMenuItem("Einf\u00FCgen");
+		mntmAusschneiden = new JMenuItem("Ausschneiden");
+		mntmLschen = new JMenuItem("L\u00F6schen");
+		
+		addPopup(this, popupMenu);
+		popupMenu.add(mntmKopieren);
+		popupMenu.add(mntmEinfgen);
+		popupMenu.add(mntmAusschneiden);
+		popupMenu.add(mntmLschen);
+		
+		mntmKopieren.addActionListener(this);
+		mntmEinfgen.addActionListener(this);
+		mntmAusschneiden.addActionListener(this);
+		mntmLschen.addActionListener(this);
+		
+		mntmEinfgen.setEnabled(false);
+		
 		this.setVisible(true);
-
 	}
 
 	public void setImage(Image img)
@@ -87,9 +127,11 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 	}
 
 	/**
+	 * Normalisiert das eingezeichnete Object
 	 * 
 	 * @param re
-	 * @return
+	 *            zu normalisierendes Objekt
+	 * @return Gibt das normiliserte Object zurück
 	 */
 	private Rectangle ausgleichRect(Rectangle re)
 	{
@@ -124,7 +166,7 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 	}
 
 	/**
-	 * 
+	 * Fügt einem ausgewähten Shape einen Html-Link hinzu
 	 */
 	private void setLink()
 	{
@@ -138,6 +180,9 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 		}
 	}
 
+	/**
+	 * Entfernt das aktuelle Bild und löscht alle eingezeichneten Bereiche
+	 */
 	public void flush()
 	{
 		shapeList.flush();
@@ -169,13 +214,28 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 		}
 
 		/* Aufbau des HTML-Codes */
-		imgmap.readFromVectorHtmlText();
+		imgmap.setTextPanelHtml();
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e)
 	{
-
+		if (e.getButton() == MouseEvent.BUTTON3) {
+			
+			for (int i = shapeList.size() - 1; i >= 0; i--) {
+				Shape shape = shapeList.getShape(i);
+				Rectangle re = shape.getShape();
+				if (shape.contains(startP)) {
+					System.out.println("Drin");
+					aktuellerShape = shape;
+					aktuelleR = re;
+					cloneP = e.getPoint();
+					cloneShape = aktuellerShape;
+					popupMenu.show(this, e.getX(), e.getY());
+					break;
+				}
+			}
+		}
 	}
 
 	@Override
@@ -201,17 +261,20 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 					Shape shape = shapeList.getShape(i);
 					Rectangle re = shape.getShape();
 					if (shape.contains(startP)) {
+						System.out.println("Drin");
 						aktuellerShape = shape;
 						aktuelleR = re;
 					}
 				}
 			}
+			
 		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e)
 	{
+		System.out.println("released");
 		Rectangle re = berechneRect();
 		Shape s = null;
 
@@ -226,6 +289,23 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 			setLink();
 			break;
 		}
+		
+		if (e.getButton() == MouseEvent.BUTTON3) {
+			for (int i = shapeList.size() - 1; i >= 0; i--) {
+				
+				Shape shape = shapeList.getShape(i);
+				Rectangle re1 = shape.getShape();
+				if (shape.contains(startP)) {
+					System.out.println("Drin");
+					aktuellerShape = shape;
+					aktuelleR = re1;
+					cloneP = e.getPoint();
+					cloneShape = aktuellerShape;
+					popupMenu.show(this, e.getX(), e.getY());
+					break;
+				}
+			}
+		}		
 
 		if (s != null) {
 			shapeList.addShape(s);
@@ -257,7 +337,66 @@ public class ImagemapPanel extends JPanel implements MouseListener,
 	public void mouseMoved(MouseEvent e)
 	{
 		Point p = e.getPoint();
+		cloneP = p;
 		imgmap.setStatusbarMouseposition("X: " + p.getX() + ", Y: " + p.getY());
 	}
 
+	private static void addPopup(Component component, final JPopupMenu popup) {
+		component.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+			public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+			private void showMenu(MouseEvent e) {
+				popup.show(e.getComponent(), e.getX(), e.getY());
+			}
+		});
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e)
+	{
+		Object src = e.getSource();
+		
+		if (src == mntmKopieren) {
+			popupSelection = COPY;
+			cloneShape = aktuellerShape;
+			mntmEinfgen.setEnabled(true);
+		}
+		if (src == mntmEinfgen) {
+			popupSelection = PASTE;
+			
+			Rectangle r = cloneShape.getShape();
+			r.setBounds(cloneP.x, cloneP.y, (int) r.getWidth(), (int) r.getHeight()); 
+			
+			cloneShape.setShape(r);
+			shapeList.addShape(cloneShape);
+			
+			
+			mntmEinfgen.setEnabled(false);
+			cloneShape = null;
+			repaint();
+		}
+		if (src == mntmAusschneiden) {
+			popupSelection = CUT;
+			shapeList.deleteShape(aktuellerShape);
+			mntmEinfgen.setEnabled(true);
+			repaint();
+		}
+		if (src == mntmLschen) {
+			System.out.println("löschen");
+			System.out.println(cloneShape.toString());
+			shapeList.deleteShape(cloneShape);
+			mntmEinfgen.setEnabled(false);
+			repaint();
+		}
+		
+		
+	}
 }

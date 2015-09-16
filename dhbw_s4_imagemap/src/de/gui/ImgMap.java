@@ -1,10 +1,15 @@
 package de.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Event;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
@@ -14,6 +19,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -30,13 +36,14 @@ import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.util.*;
 
-public class ImgMap extends JFrame implements ActionListener, WindowListener
+public class ImgMap extends JFrame implements ActionListener
 {
 
 	// CONSTANTS - Tools
@@ -64,6 +71,7 @@ public class ImgMap extends JFrame implements ActionListener, WindowListener
 	private JMenuItem mntmNeu;
 	private JMenuItem mntmBeenden;
 	private JMenuItem mntmNeuBild;
+	private JMenuItem mntmHtmlSpeichern;
 	private JMenu mnOptionen;
 	private JMenu mnHilfe;
 	private JMenuItem mntmber;
@@ -95,14 +103,14 @@ public class ImgMap extends JFrame implements ActionListener, WindowListener
 	private final JLabel lblWerkzeug = new JLabel(" ");
 	private final JLabel lblMessage = new JLabel(" ");
 	private final JLabel lblMouseposition = new JLabel(" ");
-
-	// MISC
-	Helper helper = new Helper();
 	private JToolBar toolBar_1;
 	private JButton btnSave;
 
+	// MISC
+	Helper helper = new Helper();
+
 	/**
-	 * Create the frame.
+	 * Constructur für Klasse ImgMap. Ruft die Methode init() auf.
 	 */
 	public ImgMap()
 	{
@@ -117,9 +125,14 @@ public class ImgMap extends JFrame implements ActionListener, WindowListener
 		this.setSize(framesize);
 		this.setLocationRelativeTo(null);
 		this.setTitle("ImageMap Editor");
-		this.setDefaultCloseOperation(endProgramm());
+		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
+		handleClosing();
 
 		/* Initial Bild */
+		Graphics2D g = emptyImage.createGraphics();
+		g.setColor(Color.WHITE);
+		g.fillRect(0, 0, 700, 500);
 		image = emptyImage;
 
 		mapPanel = new ImagemapPanel(this, image, shapeList);
@@ -134,17 +147,39 @@ public class ImgMap extends JFrame implements ActionListener, WindowListener
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		sP_html.setPreferredSize(new Dimension(this.getWidth(), this
 				.getHeight()));
-		
+
 		toolBar_1 = new JToolBar();
 		sP_html.setColumnHeaderView(toolBar_1);
-		
-		btnSave = new JButton("Save");
+
+		btnSave = new JButton(
+				new ImageIcon(getClass().getResource("/save.png")));
 		toolBar_1.add(btnSave);
 
 		createMenu();
 		createToolbar();
 		addListener();
 		content();
+
+	}
+
+	/**
+	 * Fängt das schließen des Festers auf
+	 */
+	private void handleClosing()
+	{
+		JFrame f = this;
+		f.addWindowListener(new java.awt.event.WindowAdapter() {
+			@Override
+			public void windowClosing(java.awt.event.WindowEvent windowEvent)
+			{
+				if (JOptionPane.showConfirmDialog(f,
+						"Möchten sie das Programm wirklich beenden?",
+						"Beenden", JOptionPane.YES_NO_OPTION,
+						JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+					System.exit(0);
+				}
+			}
+		});
 	}
 
 	/**
@@ -152,15 +187,24 @@ public class ImgMap extends JFrame implements ActionListener, WindowListener
 	 */
 	private void createMenu()
 	{
+		int menuKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+
 		menuBar = new JMenuBar();
+		mnDatei = new JMenu("Datei");
 		mnOptionen = new JMenu("Optionen");
 		mnHilfe = new JMenu("Hilfe");
 		mnLookAndFeel = new JMenu("Look and Feel");
 
-		mnDatei = new JMenu("Datei");
 		mntmNeu = new JMenuItem("Neu");
+		mntmNeu.setAccelerator(KeyStroke.getKeyStroke('N', menuKeyMask));
 		mntmNeuBild = new JMenuItem("Bild öffnen");
+		mntmNeuBild.setAccelerator(KeyStroke
+				.getKeyStroke('N', Event.SHIFT_MASK));
+		mntmHtmlSpeichern = new JMenuItem("Html speichern");
+		mntmHtmlSpeichern.setAccelerator(KeyStroke.getKeyStroke('S',
+				menuKeyMask));
 		mntmBeenden = new JMenuItem("Beenden");
+		mntmBeenden.setAccelerator(KeyStroke.getKeyStroke('Q', menuKeyMask));
 
 		mntmber = new JMenuItem("\u00DCber ...");
 
@@ -168,13 +212,17 @@ public class ImgMap extends JFrame implements ActionListener, WindowListener
 		rdbtnmntmSystem = new JRadioButtonMenuItem("System");
 		rdbtnmntmCrossplattform = new JRadioButtonMenuItem("Crossplattform");
 		rdbtnmntmMotif = new JRadioButtonMenuItem("Motif");
-
+		
+		// Menübar
 		setJMenuBar(menuBar);
 
 		// Datei-Menü
 		menuBar.add(mnDatei);
+
 		mnDatei.add(mntmNeu);
 		mnDatei.add(mntmNeuBild);
+		mnDatei.add(new JSeparator());
+		mnDatei.add(mntmHtmlSpeichern);
 		mnDatei.add(new JSeparator());
 		mnDatei.add(mntmBeenden);
 
@@ -198,6 +246,8 @@ public class ImgMap extends JFrame implements ActionListener, WindowListener
 
 	private void createToolbar()
 	{
+		int menuKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+
 		btnNeu = new JButton(new ImageIcon(getClass().getResource("/new.png")));
 		btnNeu.setToolTipText("Neues Projekt");
 		btnNeuImg = new JButton(new ImageIcon(getClass().getResource(
@@ -259,8 +309,20 @@ public class ImgMap extends JFrame implements ActionListener, WindowListener
 
 	}
 
+	/**
+	 * 
+	 */
 	private void addListener()
 	{
+		// MENU / Datei
+		mntmBeenden.addActionListener(this);
+		mntmber.addActionListener(this);
+		mntmHtmlSpeichern.addActionListener(this);
+		mntmNeu.addActionListener(this);
+		mntmNeuBild.addActionListener(this);
+
+		// MENU / Bearbeiten
+
 		// MENU / Option / Look & Feel
 		rdbtnmntmCrossplattform.addActionListener(this);
 		rdbtnmntmMotif.addActionListener(this);
@@ -274,16 +336,21 @@ public class ImgMap extends JFrame implements ActionListener, WindowListener
 		btnRectangle.addActionListener(this);
 		btnHref.addActionListener(this);
 		btnInfo.addActionListener(this);
+
+		btnSave.addActionListener(this);
 	}
 
 	/**
-	 * 
+	 * Löscht ein bereits geladenes Bild und entfernt alle markierten Bereiche
 	 */
 	private void doNeu()
 	{
 		this.mapPanel.flush();
 	}
 
+	/**
+	 * Lädt ein Bild in den Zeichenbereich
+	 */
 	private void doLoadNewImage()
 	{
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("Bilder",
@@ -318,17 +385,17 @@ public class ImgMap extends JFrame implements ActionListener, WindowListener
 	}
 
 	/**
-	 * Beendet das Programm nach einer Abfrage
+	 * Schnittstelle zum Speichern der HTML-Map in eine Datei
 	 */
-	private int endProgramm()
+	private void doSaveHTML()
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		String map = shapeList.getHTML(imgSrc, mapPanel.getWidth(),
+				mapPanel.getHeight());
+		helper.saveHtml(map, this);
 	}
 
 	/**
-	 * Methode zur Erstellung des Statusbartextes des aktuellen Werkzeuges
-	 * 
+	 * Methode zur Erstellung des Statusbartextes des aktuellen Werkzeuges.
 	 * @param mouseposition
 	 */
 	public void setStatusbarWerkzeug()
@@ -352,20 +419,27 @@ public class ImgMap extends JFrame implements ActionListener, WindowListener
 	}
 
 	/**
-	 * 
-	 * @param s
+	 * Zeigt eine Nachricht für den Benutzer in der Statusleistenmitte an
+	 * @param s Anzuzeigende Nachricht
 	 */
 	public void setStatusbarMessage(String s)
 	{
 		lblMessage.setText(",   \t\t" + s);
 	}
 
+	/**
+	 * Zeig die aktuelle Mausposition an
+	 * @param s aktuelle Mausposition
+	 */
 	public void setStatusbarMouseposition(String s)
 	{
 		lblMouseposition.setText("Mausposition:" + s);
 	}
 
-	public void readFromVectorHtmlText()
+	/**
+	 * Zeigt den HTML-Code für die markierten Bereiche in einem seperaten Panel an
+	 */
+	public void setTextPanelHtml()
 	{
 		int panelW = this.mapPanel.getWidth();
 		int panelH = this.mapPanel.getHeight();
@@ -379,12 +453,15 @@ public class ImgMap extends JFrame implements ActionListener, WindowListener
 	{
 		Object src = e.getSource();
 
-		/* Neues Project und neues Bild */
-		if (src == this.btnNeu)
+		if (src == this.btnNeu || src == this.mntmNeu)
 			doNeu();
-
-		if (src == this.btnNeuImg)
+		if (src == this.btnNeuImg || src == this.mntmNeuBild)
 			doLoadNewImage();
+		if (src == this.btnSave || src == this.mntmHtmlSpeichern)
+			doSaveHTML();
+		if (src == this.mntmBeenden) {
+			this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+		}
 
 		/* Werkzeuge */
 		if (src == this.btnArrow)
@@ -401,7 +478,7 @@ public class ImgMap extends JFrame implements ActionListener, WindowListener
 			setStatusbarMessage("Bitte wählen sie einen Shape aus!");
 		}
 
-		/* 		 */
+		/* Look & Feel */
 		if (src == this.rdbtnmntmCrossplattform) {
 			helper.changeLookAndFeel(Helper.LF_CROSS, this);
 		}
@@ -414,55 +491,6 @@ public class ImgMap extends JFrame implements ActionListener, WindowListener
 
 		/* aktualisiert das Werkzeug in der Statusbar */
 		setStatusbarWerkzeug();
-
 	}
 
-	@Override
-	public void windowActivated(WindowEvent e)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void windowClosed(WindowEvent e)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void windowClosing(WindowEvent e)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void windowDeactivated(WindowEvent e)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void windowDeiconified(WindowEvent e)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void windowIconified(WindowEvent e)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void windowOpened(WindowEvent e)
-	{
-		// TODO Auto-generated method stub
-		
-	}
 }
